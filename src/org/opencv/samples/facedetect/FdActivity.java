@@ -133,7 +133,7 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.fd_activity_surface_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
-        mOpenCvCameraView.enableFpsMeter();
+        //mOpenCvCameraView.enableFpsMeter();
     }
 
     @Override
@@ -170,33 +170,7 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
-        
-        
-        Mat can = mGray.clone();
-		Imgproc.Canny(mGray, can, 80, 90);
-		
-		int threshold = 80;
-		double minLineLength=150;
-		double maxLineGap=0 ;
-				
-		Mat lines = new Mat();
-		Imgproc.HoughLinesP(can, lines, 3, Math.PI / 60, threshold, minLineLength, maxLineGap);
-	    //Imgproc.cvtColor(can, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
-		can.release();
-		
-		 for (int x = 0; x < lines.cols(); x++) 
-		    {
-		          double[] vec = lines.get(0, x);
-		          double x1 = vec[0], 
-		                 y1 = vec[1],
-		                 x2 = vec[2],
-		                 y2 = vec[3];
-		          Point start = new Point(x1, y1);
-		          Point end = new Point(x2, y2);
-		          Core.line(mRgba, start, end, new Scalar(255,0,0), 3);
-		    }
-		 
-
+ 
         if (mAbsoluteFaceSize == 0) {
             int height = mGray.rows();
             if (Math.round(height * mRelativeFaceSize) > 0) {
@@ -239,26 +213,7 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
             		(int)(ratio * facesArray[i].width),
             		(int)(ratio * facesArray[i].height));
             		
-            Core.rectangle(mRgba, expandedFace.tl(), expandedFace.br(),
-            		COLOR_BLUE, 3);
-            
-            for (int j = 0; j < lines.cols(); j++) 
-		    {
-		          double[] vec = lines.get(0, j);
-		          double x1 = vec[0], 
-		                 y1 = vec[1],
-		                 x2 = vec[2],
-		                 y2 = vec[3];
-		          Point start = new Point(x1, y1);
-		          Point end = new Point(x2, y2);
-		          
-		          if (start.inside(expandedFace) || end.inside(expandedFace))
-		          {
-		        	  Core.line(mRgba, start, end, new Scalar(255,255,0), 8);
-		          }
-		    }
-		 
-            
+ //           Core.rectangle(mRgba, expandedFace.tl(), expandedFace.br(), COLOR_BLUE, 3);
             
             
             //width crop
@@ -310,7 +265,7 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
             //Core.rectangle(mRgba, pw1, pw2, COLOR_RED, Core.FILLED);
             //Core.rectangle(mRgba, ph1, ph2, COLOR_BLUE, Core.FILLED);
             
-            Scalar s = new Scalar(0.8);
+            Scalar s = new Scalar(0.6, 0.5, 0.5);
             
             Mat rgbaInnerWindow = mRgba.submat((int)ph1.y, (int)ph2.y, (int)ph1.x, (int)ph2.x);
             Core.multiply(rgbaInnerWindow, s, rgbaInnerWindow);
