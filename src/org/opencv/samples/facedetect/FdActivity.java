@@ -206,32 +206,28 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
             Core.circle(mRgba, center, radius, color);   
             
             double posX = center.x / mRgba.width();
+            Point pw1 = new Point(0, 0);
+            Point pw2 = new Point(mRgba.width(), mRgba.height());
+            
             //Log.i(TAG, ""+posX);
             if (posX < 1.0/3)
             {
-            	Core.rectangle(mRgba, new Point(3 * center.x,0),
-            			new Point(mRgba.width(), mRgba.height()),
-            			COLOR_RED, Core.FILLED);
+            	pw1.x = 3 * center.x;
             }
             else if (posX < 1.0/2)
             {
-            	Core.rectangle(mRgba, new Point(0,0),
-            			new Point((3 * center.x - mRgba.width()) / 2, mRgba.height()),
-            			COLOR_RED, Core.FILLED);
+            	pw2.x = (3 * center.x - mRgba.width()) / 2;
             }
             else if (posX < 2.0/3)
             {
-             	Core.rectangle(mRgba, new Point(3.0 / 2 * center.x,0),
-            			new Point(mRgba.width(), mRgba.height()),
-            			COLOR_RED, Core.FILLED);
+             	pw1.x = 3.0 / 2 * center.x;
             }
             else
             {
-            	Core.rectangle(mRgba, new Point(0,0),
-            			new Point((3 * center.x - 2 * mRgba.width()), mRgba.height()),
-            			COLOR_RED, Core.FILLED);
+            	pw2.x = (3 * center.x - 2 * mRgba.width());
             }
-
+            Core.rectangle(mRgba, pw1, pw2, COLOR_RED, Core.FILLED);
+            
             
             
             
@@ -247,7 +243,7 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 				
 		Mat lines = new Mat();
 		Imgproc.HoughLinesP(can, lines, 3, Math.PI / 60, threshold, minLineLength, maxLineGap);
-	    Imgproc.cvtColor(can, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
+	    //Imgproc.cvtColor(can, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
 
 		 for (int x = 0; x < lines.cols(); x++) 
 		    {
