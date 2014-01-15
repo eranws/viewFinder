@@ -38,8 +38,8 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 
     private static final Scalar    
     COLOR_BLACK     = new Scalar(0, 0, 0, 255),
-    COLOR_RED = new Scalar(255, 0, 0, 255);
-    
+    COLOR_RED = new Scalar(255, 0, 0, 128),
+    COLOR_BLUE = new Scalar(0, 0, 255, 128);
 
     private MenuItem               mItemFace50;
     private MenuItem               mItemFace40;
@@ -205,6 +205,7 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
             Scalar color = FACE_RECT_COLOR;
             Core.circle(mRgba, center, radius, color);   
             
+            //width crop
             double posX = center.x / mRgba.width();
             Point pw1 = new Point(0, 0);
             Point pw2 = new Point(mRgba.width(), mRgba.height());
@@ -227,6 +228,30 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
             	pw2.x = (3 * center.x - 2 * mRgba.width());
             }
             Core.rectangle(mRgba, pw1, pw2, COLOR_RED, Core.FILLED);
+            
+            //height crop
+            double posY = center.y / mRgba.height();
+            Point ph1 = new Point(0, 0);
+            Point ph2 = new Point(mRgba.width(), mRgba.height());
+            
+            //Log.i(TAG, ""+posX);
+            if (posY < 1.0/3)
+            {
+            	ph1.y = 3 * center.y;
+            }
+            else if (posY < 1.0/2)
+            {
+            	ph2.y = (3 * center.y - mRgba.height()) / 2;
+            }
+            else if (posY < 2.0/3)
+            {
+             	ph1.y = 3.0 / 2 * center.y;
+            }
+            else
+            {
+            	ph2.y = (3 * center.y - 2 * mRgba.height());
+            }
+            Core.rectangle(mRgba, ph1, ph2, COLOR_BLUE, Core.FILLED);
             
             
             
