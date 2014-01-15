@@ -169,6 +169,31 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
+        
+        
+        Mat can = mGray.clone();
+		Imgproc.Canny(mGray, can, 80, 90);
+		
+		int threshold = 80;
+		double minLineLength=50;
+		double maxLineGap=10 ;
+				
+		Mat lines = new Mat();
+		Imgproc.HoughLinesP(can, lines, 3, Math.PI / 60, threshold, minLineLength, maxLineGap);
+	    //Imgproc.cvtColor(can, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
+
+		 for (int x = 0; x < lines.cols(); x++) 
+		    {
+		          double[] vec = lines.get(0, x);
+		          double x1 = vec[0], 
+		                 y1 = vec[1],
+		                 x2 = vec[2],
+		                 y2 = vec[3];
+		          Point start = new Point(x1, y1);
+		          Point end = new Point(x2, y2);
+		          Core.line(mRgba, start, end, new Scalar(255,0,0), 3);
+		    }
+		 
 
         if (mAbsoluteFaceSize == 0) {
             int height = mGray.rows();
@@ -258,29 +283,7 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
             
                         
         }
-        
-        Mat can = mGray.clone();
-		Imgproc.Canny(mGray, can, 80, 90);
-		
-		int threshold = 80;
-		double minLineLength=50;
-		double maxLineGap=0 ;
-				
-		Mat lines = new Mat();
-		Imgproc.HoughLinesP(can, lines, 3, Math.PI / 60, threshold, minLineLength, maxLineGap);
-	    //Imgproc.cvtColor(can, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
-
-		 for (int x = 0; x < lines.cols(); x++) 
-		    {
-		          double[] vec = lines.get(0, x);
-		          double x1 = vec[0], 
-		                 y1 = vec[1],
-		                 x2 = vec[2],
-		                 y2 = vec[3];
-		          Point start = new Point(x1, y1);
-		          Point end = new Point(x2, y2);
-		          Core.line(mRgba, start, end, new Scalar(255,0,0), 3);
-		    }
+       
         return mRgba;
     }
 
