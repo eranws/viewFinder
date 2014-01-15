@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
 public class FdActivity extends Activity implements CvCameraViewListener2 {
 
@@ -175,13 +176,14 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 		Imgproc.Canny(mGray, can, 80, 90);
 		
 		int threshold = 80;
-		double minLineLength=50;
-		double maxLineGap=10 ;
+		double minLineLength=150;
+		double maxLineGap=0 ;
 				
 		Mat lines = new Mat();
 		Imgproc.HoughLinesP(can, lines, 3, Math.PI / 60, threshold, minLineLength, maxLineGap);
 	    //Imgproc.cvtColor(can, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
-
+		can.release();
+		
 		 for (int x = 0; x < lines.cols(); x++) 
 		    {
 		          double[] vec = lines.get(0, x);
@@ -219,7 +221,7 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
         }
 
         Rect[] facesArray = faces.toArray();
-        for (int i = 0; i < facesArray.length; i++)
+        for (int i = 0; i < Math.min(1,facesArray.length); i++)
         {
             //Core.rectangle(mRgba, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
             
@@ -229,6 +231,35 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
             int radius = facesArray[i].width / 2;
             Scalar color = FACE_RECT_COLOR;
             Core.circle(mRgba, center, radius, color);   
+            
+            float ratio = 3f;
+            Rect expandedFace = new Rect(
+            		(int)(facesArray[i].x - (ratio-1)/2*facesArray[i].width),
+            		(int)(facesArray[i].y - (ratio-1)/2*facesArray[i].height),
+            		(int)(ratio * facesArray[i].width),
+            		(int)(ratio * facesArray[i].height));
+            		
+            Core.rectangle(mRgba, expandedFace.tl(), expandedFace.br(),
+            		COLOR_BLUE, 3);
+            
+            for (int j = 0; j < lines.cols(); j++) 
+		    {
+		          double[] vec = lines.get(0, j);
+		          double x1 = vec[0], 
+		                 y1 = vec[1],
+		                 x2 = vec[2],
+		                 y2 = vec[3];
+		          Point start = new Point(x1, y1);
+		          Point end = new Point(x2, y2);
+		          
+		          if (start.inside(expandedFace) || end.inside(expandedFace))
+		          {
+		        	  Core.line(mRgba, start, end, new Scalar(255,255,0), 8);
+		          }
+		    }
+		 
+            
+            
             
             //width crop
             double posX = center.x / mRgba.width();
@@ -252,7 +283,6 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
             {
             	pw2.x = (3 * center.x - 2 * mRgba.width());
             }
-            Core.rectangle(mRgba, pw1, pw2, COLOR_RED, Core.FILLED);
             
             //height crop
             double posY = center.y / mRgba.height();
@@ -276,7 +306,23 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
             {
             	ph2.y = (3 * center.y - 2 * mRgba.height());
             }
-            Core.rectangle(mRgba, ph1, ph2, COLOR_BLUE, Core.FILLED);
+
+            //Core.rectangle(mRgba, pw1, pw2, COLOR_RED, Core.FILLED);
+            //Core.rectangle(mRgba, ph1, ph2, COLOR_BLUE, Core.FILLED);
+            
+            Scalar s = new Scalar(0.8);
+            
+            Mat rgbaInnerWindow = mRgba.submat((int)ph1.y, (int)ph2.y, (int)ph1.x, (int)ph2.x);
+            Core.multiply(rgbaInnerWindow, s, rgbaInnerWindow);
+            Mat rgbaInnerWindow2 = mRgba.submat((int)pw1.y, (int)pw2.y, (int)pw1.x, (int)pw2.x);
+            Core.multiply(rgbaInnerWindow2, s, rgbaInnerWindow2);
+            
+
+//            Mat invertcolormatrix= new Mat(rgbaInnerWindow.rows(),rgbaInnerWindow.cols(), rgbaInnerWindow.type(), new Scalar(255,255,255));
+ //           Core.mul(invertcolormatrix, rgbaInnerWindow, rgbaInnerWindow);
+            
+//            Imgproc.cvtColor(rgbaInnerWindow, rgbaInnerWindow, Imgproc.COLOR_GRAY2BGRA, 4);
+            
             
             
             
